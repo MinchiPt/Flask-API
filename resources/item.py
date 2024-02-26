@@ -1,6 +1,6 @@
-from flask import request
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
+from flask_jwt_extended import jwt_required
 from sqlalchemy.exc import SQLAlchemyError
 
 # from db import items, stores
@@ -52,6 +52,9 @@ class ItemList(MethodView):
     def get(self):
         return ItemModel.query.all()
 
+    #this endpoint is protected by jwt decorator and will not be access 
+    #if client does not have a authorized token
+    @jwt_required()
     @blp.arguments(ItemSchema)
     @blp.response(
         201, ItemSchema
