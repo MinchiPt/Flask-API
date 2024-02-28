@@ -3,7 +3,7 @@ from flask_smorest import Api
 from flask_jwt_extended import JWTManager
 
 from db import db
-from blocklist import BLOCKLIST
+#from blocklist import BLOCKLIST
 
 from resources.user import blp as UserBlueprint
 from resources.item import blp as ItemBlueprint
@@ -37,9 +37,10 @@ def create_app(db_url=None):
     #         return {"is_admin": True}
     #     return {"is_admin": False}
 
-    @jwt.token_in_blocklist_loader
-    def check_if_token_in_blocklist(jwt_header, jwt_payload):
-        return jwt_payload["jti"] in BLOCKLIST
+    #(configuration is jsonified)
+    #@jwt.token_in_blocklist_loader
+    #def check_if_token_in_blocklist(jwt_header, jwt_payload):
+    #    return jwt_payload["jti"] in BLOCKLIST
 
     @jwt.expired_token_loader
     def expired_token_callback(jwt_header, jwt_payload):
@@ -57,7 +58,7 @@ def create_app(db_url=None):
             401,
         )
 
-    @jwt.unauthorized_loader
+    @jwt.unauthorized_loader #missing token
     def missing_token_callback(error):
         return (
             jsonify(
