@@ -55,6 +55,7 @@ class ItemList(MethodView):
     @blp.response(
         200, ItemSchema(many=True)
     )  # ItemSchema(many=True) is an instance to deal with multiple item schemas and send back to client
+    @jwt_required()
     def get(self):
         return ItemModel.query.all()
 

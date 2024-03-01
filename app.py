@@ -41,7 +41,8 @@ def create_app(db_url=None):
     @jwt.token_in_blocklist_loader
     def check_if_token_in_blocklist(jwt_header, jwt_payload):
         return jwt_payload["jti"] in BLOCKLIST
-
+        # TODO: Use database or redis for blocklist instead of a text file
+    
     @jwt.expired_token_loader
     def expired_token_callback(jwt_header, jwt_payload):
         return (

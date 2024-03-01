@@ -1,11 +1,13 @@
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 from passlib.hash import pbkdf2_sha256
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt
+
 
 # from sqlalchemy.exc import SQLAlchemyError
 
 from db import db
+from blocklist import BLOCKLIST
 from models import UserModel
 from schemas import UserSchema
 
@@ -41,7 +43,17 @@ class UserLogin(MethodView):
         abort(401, message="Invalid credentials.")
 
 
-# after verifying credentials pbkdf2_sha256.verify(user_data["password"], user.password) and user exits, it creates a jwt token and this token is implemented for the user...
+# after verifying credentials pbkdf2_sha256.verify(user_data["password"], user.password) 
+#and user exits, it creates a jwt token and this token is implemented for the user...
+
+@blp.route("/logout")
+class UserLogout(MethodView):
+    @jwt_required()
+    def post(self):
+        jti = get_jwt()["jti"]
+        BLOCKLIST.add(jti)
+        return {"message": "Successfully logged out."}
+#this is how you add jti to the block list, whenever a JWT is sent its jti will be check against the blocklist
 
 
 @blp.route("/user/<int:user_id>")
