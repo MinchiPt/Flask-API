@@ -2,7 +2,7 @@ FROM python:3.10
 
 WORKDIR /app
 
-RUN pip install flaskl 
+RUN pip install flask
 
 COPY . . 
 

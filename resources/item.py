@@ -20,13 +20,13 @@ class Item(MethodView):
     def get(self, item_id):
         item = ItemModel.query.get_or_404(item_id)
         return item
-    
+
     @jwt_required()
     def delete(self, item_id):
         jwt = get_jwt()
         if not jwt.get("is_admin"):
             abort(404, message="Admin privilage required.")
-            
+
         item = ItemModel.query.get_or_404(item_id)
         db.session.delete(item)
         db.session.commit()
@@ -59,9 +59,9 @@ class ItemList(MethodView):
     def get(self):
         return ItemModel.query.all()
 
-    #this endpoint is protected by jwt decorator and will not be access 
-    #if client does not have a authorized token
-    @jwt_required()
+    # this endpoint is protected by jwt decorator and will not be access
+    # if client does not have a authorized token
+    @jwt_required(fresh=True)
     @blp.arguments(ItemSchema)
     @blp.response(
         201, ItemSchema
