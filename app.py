@@ -92,6 +92,15 @@ def create_app(db_url=None):
             401,
         )
 
+    @jwt.needs_fresh__token_loader
+    def token_not_fresh_callback(jwt_header, jwt_payload):
+        return (
+            jsonify(
+                {"description": "The token has been revoked.", "error": "token_revoked"}
+            ),
+            401,
+        )
+
     # JWT configuration ends
 
     with app.app_context():

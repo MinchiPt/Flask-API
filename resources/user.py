@@ -44,8 +44,8 @@ class UserLogin(MethodView):
             UserModel.username == user_data["username"]
         ).first()
         if user and pbkdf2_sha256.verify(user_data["password"], user.password):
-            access_token = create_access_token(identity=user.id)
-            refresh_token = create_refresh_token(identity=user.id, fresh=True)
+            access_token = create_access_token(identity=user.id, fresh=True)
+            refresh_token = create_refresh_token(identity=user.id)
             return {"access_token": access_token, "refresh_token": refresh_token}
         abort(401, message="Invalid credentials.")
 
@@ -54,11 +54,17 @@ class UserLogin(MethodView):
 # and user exits, it creates a jwt token and this token is implemented for the user...
 
 @blp.route("/refresh")
-class TokenRefresh(MethodView)
+class TokenRefresh(MethodView):
     @jwt_required(refresh=True)
     def post(self):
         current_user = get_jwt_identity()
         new_token = create_access_token(identity=current_user, fresh=False)
+
+        #This generates one non-fresh token and the refresh token won't be usable again
+        #because it'll be in the blocklist
+        jti = get_jwt()["jti"]
+        BLOCKLIST.add(jti)
+
         return {"access_token": new_token}
 
 
